@@ -1,0 +1,64 @@
+{"text":"Good afternoon, is the shop open on Sunday?","needs":["hours"],"intent":"reply"}
+{"text":"wat time u close 2day","needs":["hours"],"intent":"reply"}
+{"text":"Till what time are you attending to customers today?","needs":["hours"],"intent":"reply"}
+{"text":"Do you open early on Saturdays?","needs":["hours"],"intent":"reply"}
+{"text":"una dey open tomorrow?","needs":["hours"],"intent":"reply"}
+{"text":"Hello, what are your working hours?","needs":["hours"],"intent":"reply"}
+{"text":"Please where exactly are you located, I'm coming from Rumuola","needs":["location"],"intent":"reply"}
+{"text":"send ur location pls","needs":["location"],"intent":"reply"}
+{"text":"Which street is your shop on?","needs":["location"],"intent":"reply"}
+{"text":"abeg where una dey? i wan come","needs":["location"],"intent":"reply"}
+{"text":"Is your place close to the main market?","needs":["location"],"intent":"reply"}
+{"text":"Can you share the google map pin?","needs":["location"],"intent":"reply"}
+{"text":"Can I pay with transfer or must it be cash?","needs":["payment"],"intent":"reply"}
+{"text":"Do you have a link I can pay with?","needs":["payment"],"intent":"reply"}
+{"text":"Kindly send your account details","needs":["payment"],"intent":"reply"}
+{"text":"I want to make payment, where do I send the money","needs":["payment"],"intent":"reply"}
+{"text":"abeg una dey take transfer?","needs":["payment"],"intent":"reply"}
+{"text":"do you do pay on delivery","needs":["payment","delivery"],"intent":"reply"}
+{"text":"Do you deliver to Lekki and how long does it take?","needs":["delivery"],"intent":"reply"}
+{"text":"How much is delivery to Garki?","needs":["delivery"],"intent":"reply"}
+{"text":"Can I come and pick it up myself?","needs":["delivery"],"intent":"reply"}
+{"text":"una fit deliver am come my house?","needs":["delivery"],"intent":"reply"}
+{"text":"When will my order arrive?","needs":["delivery"],"intent":"reply"}
+{"text":"How much is the blue ankara per yard?","needs":["prices"],"intent":"reply"}
+{"text":"send me your price list please","needs":["prices"],"intent":"reply"}
+{"text":"What do you charge for a full set of braids?","needs":["prices"],"intent":"reply"}
+{"text":"how much be the black dress","needs":["prices"],"intent":"reply"}
+{"text":"Is the 3 tier cake very expensive?","needs":["prices"],"intent":"reply"}
+{"text":"abeg wetin be the price for bridal makeup","needs":["prices"],"intent":"reply"}
+{"text":"I would like to book an appointment for Friday afternoon","needs":["booking"],"intent":"schedule"}
+{"text":"Please can I move my 2pm to 4pm?","needs":["booking"],"intent":"schedule"}
+{"text":"I need to cancel my booking for tomorrow, sorry","needs":["booking"],"intent":"schedule"}
+{"text":"Do you have any free slot this week?","needs":["booking"],"intent":"schedule"}
+{"text":"how much is the deposit to hold a date","needs":["booking"],"intent":"schedule"}
+{"text":"I wan book for Saturday abeg","needs":["booking"],"intent":"schedule"}
+{"text":"The shoes I received are too small, can I exchange them?","needs":["returns"],"intent":"reply"}
+{"text":"I want my money back, the item came damaged","needs":["returns"],"intent":"reply"}
+{"text":"what is your refund policy","needs":["returns"],"intent":"reply"}
+{"text":"dem send me wrong size, make una change am","needs":["returns"],"intent":"reply"}
+{"text":"Can I return it if I don't like it?","needs":["returns"],"intent":"reply"}
+{"text":"What's your phone number? I'd rather call","needs":["contact"],"intent":"reply"}
+{"text":"Is there someone I can speak to about my order?","needs":["contact"],"intent":"reply"}
+{"text":"abeg drop your number make I call you","needs":["contact"],"intent":"reply"}
+{"text":"do you have an email address I can write to","needs":["contact"],"intent":"reply"}
+{"text":"Can I whatsapp this number or do you have another?","needs":["contact"],"intent":"reply"}
+{"text":"Can you give me a quote for painting two bedrooms?","needs":["prices"],"intent":"quote"}
+{"text":"How much would it cost to fix a leaking pipe in the kitchen?","needs":["prices"],"intent":"quote"}
+{"text":"I need an estimate for installing a ceiling fan","needs":["prices"],"intent":"quote"}
+{"text":"how much e go cost make una build wardrobe for me","needs":["prices"],"intent":"quote"}
+{"text":"Hi, are you open Sunday and where exactly are you?","needs":["hours","location"],"intent":"reply"}
+{"text":"How much is delivery and can I pay on delivery?","needs":["delivery","payment"],"intent":"reply"}
+{"text":"I want to book for Friday, how much is the deposit and where is your shop?","needs":["booking","location"],"intent":"schedule"}
+{"text":"Price for the wig please, and do you have a refund policy?","needs":["prices","returns"],"intent":"reply"}
+{"text":"abeg where una dey and which time una dey close?","needs":["location","hours"],"intent":"reply"}
+{"text":"Thank you so much, I love my hair!","needs":[],"intent":"reply"}
+{"text":"Good morning","needs":[],"intent":"reply"}
+{"text":"ok noted, see you then","needs":[],"intent":"reply"}
+{"text":"e sweet me well well, thank you o","needs":[],"intent":"reply"}
+{"text":"Just wanted to say you did a great job","needs":[],"intent":"reply"}
+{"text":"Hello","needs":[],"intent":"reply"}
+{"text":"I will tell my friends about you","needs":[],"intent":"reply"}
+{"text":"How are you today ma","needs":[],"intent":"reply"}
+{"text":"Please remind me what I ordered","needs":[],"intent":"reply"}
+{"text":"Is my order ready?","needs":[],"intent":"reply"}

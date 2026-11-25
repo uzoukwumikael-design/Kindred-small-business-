@@ -1,0 +1,92 @@
+// The guards and the launch health check, tested without a browser.
+process.env.CRON_SECRET = "a-long-random-secret-for-tests-1234";
+process.env.VITE_SUPABASE_URL = "http://supabase.test";
+process.env.VITE_SUPABASE_ANON_KEY = "anon-key";
+process.env.VITE_CONTROLLER_NAME = "Test Operator";
+process.env.VITE_CONTACT_EMAIL = "hi@example.com";
+process.env.VITE_GOOGLE_AUTH = "false";
+process.env.SITE_URL = "https://kindling.test";
+const { allow, sameSecret } = await import("../../src/lib/kindling/guard");
+let bad = 0;
+const t = (name: string, cond: boolean) => { if (!cond) bad++; console.log((cond ? "PASS " : "FAIL ") + name); };
+
+// ---------- rate limiter and secret comparison
+t("the first calls are allowed up to the limit", [1, 2, 3].every(() => allow("t1", "ip", 3, 60_000)));
+t("the next call is refused", !allow("t1", "ip", 3, 60_000));
+t("another caller is unaffected", allow("t1", "other-ip", 3, 60_000));
+t("another limit name is unaffected", allow("t2", "ip", 3, 60_000));
+t("the window slides: old calls stop counting", (() => { allow("t3", "ip", 1, 20); return true; })() && (await new Promise((r) => setTimeout(r, 40)), allow("t3", "ip", 1, 20)));
+t("equal secrets match", sameSecret("abcdef", "abcdef"));
+t("different secrets do not", !sameSecret("abcdef", "abcdeg"));
+t("different lengths do not", !sameSecret("abc", "abcd"));
+t("empty secrets never match", !sameSecret("", "") && !sameSecret("a", ""));
+
+// ---------- health check against a fake Supabase
+type Fake = { settings: object; rls: boolean; missing: string[]; status: number };
+let fake: Fake = { settings: { disable_signup: false, mailer_autoconfirm: false, external: { email: true, google: true } }, rls: true, missing: [], status: 200 };
+const realFetch = globalThis.fetch;
+globalThis.fetch = (async (input: any, init?: any) => {
+  const url = String(input);
+  const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+  if (!url.startsWith("http://supabase.test")) return realFetch(input, init);
+  if (fake.status !== 200 && url.includes("/auth/v1/settings")) return json({}, fake.status);
+  if (url.includes("/auth/v1/settings")) return json(fake.settings);
+  const table = /rest\/v1\/(\w+)/.exec(url)?.[1] ?? "";
+  const asService = String(init?.headers?.Authorization ?? "").startsWith("Bearer svc");
+  if (fake.missing.includes(table)) return json({ message: "relation does not exist" }, 404);
+  if (!asService && !fake.rls) return json([{ user_id: "someone" }]);
+  return json([]);
+}) as typeof fetch;
+const { runHealth } = await import("../../src/lib/kindling/health.server");
+const status = (r: Awaited<ReturnType<typeof runHealth>>, id: string) => r.checks.find((c) => c.id === id)?.status;
+
+process.env.SUPABASE_SERVICE_ROLE_KEY = "svc";
+process.env.GEMINI_API_KEY = "k";
+process.env.RESEND_API_KEY = "rk";
+process.env.EMAIL_FROM = "Kindling <hi@x.com>";
+process.env.EMAIL_FOOTER = "Test, 1 Road";
+let r = await runHealth();
+t("a healthy setup passes", r.ok && status(r, "supabase-reachable") === "pass" && status(r, "schema") === "pass" && status(r, "rls") === "pass");
+t("the summary counts results", /\d+ passed, \d+ to review, \d+ to fix/.test(r.summary));
+t("no secret value is ever printed", !JSON.stringify(r).includes("svc") && !JSON.stringify(r).includes("rk") && !JSON.stringify(r).includes(process.env.CRON_SECRET!));
+
+fake = { ...fake, missing: ["kindling_prefs", "kindling_teams"] };
+r = await runHealth();
+t("missing tables are named", status(r, "schema") === "fail" && r.checks.find((c) => c.id === "schema")!.detail.includes("kindling_prefs") && !r.ok);
+fake = { ...fake, missing: [], rls: false };
+r = await runHealth();
+t("readable private rows are a failure", status(r, "rls") === "fail" && !r.ok);
+fake = { ...fake, rls: true, status: 503 };
+r = await runHealth();
+t("an unreachable Supabase is a failure", status(r, "supabase-reachable") === "fail");
+fake = { settings: { disable_signup: false, mailer_autoconfirm: true, external: { email: true, google: false } }, rls: true, missing: [], status: 200 };
+r = await runHealth();
+t("auto-confirm is a warning about unverified emails", status(r, "email-confirm") === "warn");
+process.env.VITE_GOOGLE_AUTH = "true";
+r = await runHealth();
+t("the Google button without Google enabled is a failure", status(r, "google-auth") === "fail");
+process.env.VITE_GOOGLE_AUTH = "false";
+process.env.VITE_SERVICE_ROLE_KEY = "oops";
+r = await runHealth();
+t("a secret in a public variable is a failure", status(r, "no-secret-in-public-vars") === "fail" && r.checks.find((c) => c.id === "no-secret-in-public-vars")!.detail.includes("VITE_SERVICE_ROLE_KEY"));
+delete process.env.VITE_SERVICE_ROLE_KEY;
+process.env.CRON_SECRET = "short";
+r = await runHealth();
+t("a short cron secret is a warning", status(r, "cron-secret") === "warn");
+delete process.env.CRON_SECRET;
+r = await runHealth();
+t("no cron secret is a failure", status(r, "cron-secret") === "fail");
+delete process.env.VITE_CONTROLLER_NAME;
+r = await runHealth();
+t("a missing privacy identity is a warning", status(r, "privacy-identity") === "warn");
+delete process.env.SITE_URL;
+r = await runHealth();
+t("a missing site url is a warning", status(r, "site-url") === "warn");
+delete process.env.GEMINI_API_KEY;
+r = await runHealth();
+t("no AI key is a warning, not a failure", status(r, "ai") === "warn");
+delete process.env.VITE_SUPABASE_URL;
+r = await runHealth();
+t("no Supabase settings is a warning that explains what is off", status(r, "supabase-env") === "warn");
+globalThis.fetch = realFetch;
+process.exit(bad ? 1 : 0);

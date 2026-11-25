@@ -1,0 +1,10 @@
+node_modules
+.vercel
+.tanstack
+.env
+.env.local
+*.log
+.DS_Store
+data/exports
+evals/report.md
+backups
